@@ -1,105 +1,89 @@
-﻿#include <iostream>
+//V2
 
+#include <iostream>
 
 #define SIZE 3
 
 using namespace std; // осуждаем!!!!
 
-void displayMenu(char pole[SIZE][SIZE])
+
+
+void start_game(char** array, int &rows, int& cols)
+{
+	for (size_t i = 0; i < rows; i++)
+	{
+		for (size_t j = 0; j < cols; j++)
+		{
+			array[i][j] = 'Z';
+		}
+	}
+}
+void displayMenu(char** array, int& rows, int& cols)
 {
 	cout << "Игра крестики нолики!" << endl;
-	for (size_t i = 0; i < SIZE; i++)
-	{
-		for (size_t j = 0; j < SIZE; j++)
-		{
-			cout << pole[i][j] << " ";
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			std::cout << array[i][j] << " "; // Пример инициализации
 		}
-		cout << endl;
-	}
-
-}
-void start_game(char pole[3][3])
-{
-	for (size_t i = 0; i < SIZE; i++)
-	{
-		for (size_t j = 0; j < SIZE; j++)
-		{
-			pole[i][j] = 'Z';
-		}
-
-
+		cout << '\n';
 	}
 }
-void checkXO(char& a)
+void checkXO(char& Currplayer)
 {
-	cout << " Выберети X или O ";
-	cin >> a;
-	a = toupper(a);
-	while (a != 'X' && a != 'O')
+	while (Currplayer != 'X' && Currplayer != 'O')
 	{
 		cout << " Выберети X или O ";
-		cin >> a;
-		a = toupper(a);
+		cin >> Currplayer;
+		Currplayer = toupper(Currplayer);
 	}
 
 }
-
-bool checkCin(char pole[3][3], int& row, int& col, char& num)
+bool checkCin(char** array, int& row, int& col, char& Currplayer,int& rows, int& cols)
 {
 	while (true)
 	{
-		cout << "Введети ряд!(0-2)";
+		cout << "Введети ряд!";
 		cin >> row;
-		cout << "Введети колонку!(0-2)";
+		cout << "Введети колонку!";
 		cin >> col;
 
-		if (row > 2 || row < 0 || col < 0|| col > 2 || pole[row][col] != 'Z')
+		if (row > rows || row < 0 || col < 0|| col > cols || array[row][col] != 'Z')
 		{
 			cout << " видимо где то ошибка  " << endl;
 			continue;
 		
 		}
 
-			pole[row][col] = num;
+		array[row][col] = Currplayer;
 			cout << "Метка поставилена!";
-			displayMenu(pole);
+			displayMenu(array, rows, cols);
 			return true;
 
 	}
 
 }
-
-bool checkWin(char player, char board[3][3]) {
-	for (int i = 0; i < SIZE; i++) {
-		if (board[i][0] == player && board[i][1] == player && board[i][2] == player) {
+bool checkWin(char player, char** board, int rows, int cols) {
+	for (int i = 0; i < rows; i++) {
+		if ((board[i][0] == player && board[i][1] == player && board[i][2] == player) 
+			||  board[0][i] == player && board[1][i] == player && board[2][i] == player) { // Вертикали
+			cout << "Игрок " << player << " выиграл!" << endl;
 			return true;
 		}
 	}
-
-	for (int i = 0; i < SIZE; i++) {
-		if (board[0][i] == player && board[1][i] == player && board[2][i] == player) {
-			cout << "Игрок " << player << " выйграл!";
-			return true;
-		}
-	}
-
-	if (board[0][0] == player && board[1][1] == player && board[2][2] == player) {
-		cout << "Игрок " << player << " выйграл!";
-		return true;
-	}
-	if (board[0][2] == player && board[1][1] == player && board[2][0] == player) {
-		cout << "Игрок " << player << " выйграл!";
+	if ((board[0][0] == player && board[1][1] == player && board[2][2] == player) ||
+		(board[0][2] == player && board[1][1] == player && board[2][0] == player)) {
+		cout << "Игрок " << player << " выиграл!" << endl;
 		return true;
 	}
 
 	return false;
 }
-bool isDraw(char pole[3][3]) {
-	for (size_t i = 0; i < SIZE; i++)
+bool isDraw(char** array,int rows) {
+	for (size_t i = 0; i < rows; i++)
 	{
-		for (size_t j = 0;  j < SIZE;  j++)
+		for (size_t j = 0;  j < rows;  j++)
 		{
-			if (pole[i][j] == 'Z')
+			if (array[i][j] == 'Z')
 			{
 				return false;
 			}
@@ -107,32 +91,62 @@ bool isDraw(char pole[3][3]) {
 	}
 	return true;
 }
-int main()
+void fillarr(char** arr, int& row, int& col)
 {
-	setlocale(LC_ALL, "RU");
 	
-	char game_pole[3][3] = {};
+	
+}
+void deletearr(char** arr, int& rows)
+{
+	for (size_t i = 0; i < rows; i++)
+	{
+		delete[] arr[i];
+	}
+
+	delete[] arr;
+	arr = nullptr;
+
+}
+
+
+int main()
+{	
+	setlocale(LC_ALL, "RU");
+
+	int rows = 0, cols = 0;
 	char player = 0;
-	int row = 0,col = 0; 
-	start_game(game_pole);
-	displayMenu(game_pole);
+	int row = 0, col = 0;
+
+	cout << "Введите количество строк: ";
+	cin >> rows;
+	cout << "Введите количество столбцов: ";
+	cin >> cols;
+	char** game_pole = new char*[rows];
+
+	for (size_t i = 0; i < rows; i++)
+	{
+		game_pole[i] = new char[cols];
+	}
+
+	start_game(game_pole,rows,cols);
+	displayMenu(game_pole,rows,cols);
 	checkXO(player);
 
 	while (true)
 	{
-		if (checkCin(game_pole, row, col, player))
+		if (checkCin(game_pole, row, col, player,rows,cols))
 		{
 			
 
-			if (checkWin(player,game_pole))
+			if (checkWin(player,game_pole,rows,cols))
 			{
-				displayMenu(game_pole);
+				displayMenu(game_pole,rows,cols);
 				break;
 			}
 
-			if (isDraw(game_pole))
+			if (isDraw(game_pole,rows))
 			{
-				displayMenu(game_pole);
+				displayMenu(game_pole,rows,cols);
 				break;
 			}
 			
@@ -141,6 +155,7 @@ int main()
 
 	}
 
+	deletearr(game_pole, rows);
 
 	return 0;
 }
